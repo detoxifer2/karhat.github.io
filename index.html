@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ردیاب کارها</title>
+    <style>
+        @font-face {
+        font-family: 'Vazirmatn';
+        src: url('D:\karhat\static\fonts') format('truetype');
+    }
+
+    body {
+        font-family: 'Vazirmatn', sans-serif; /* Use your font */
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+        direction: rtl; /* Set text direction to right-to-left */
+        text-align: center; /* Center text */
+    }
+
+    h1 {
+        color: #333;
+        margin-bottom: 20px; /* Add some spacing below the heading */
+    }
+
+    #goals {
+        display: flex;
+        flex-direction: column; /* Stack goals vertically */
+        align-items: center; /* Center items horizontally */
+        justify-content: center; /* Center items vertically */
+        /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+    }
+
+    .goal {
+        margin: 15px 0;
+        padding: 10px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 90%; /* Adjust width for responsiveness */
+        max-width: 400px; /* Set a maximum width */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .progress-bar-container {
+        background-color: #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+        height: 15px; /* Make the progress bar height smaller */
+        margin: 10px 0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .progress-bar {
+        height: 100%;
+        background-color: #5cb85c;
+        transition: width 0.3s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    input[type="text"], input[type="number"] {
+        font-family: 'Vazirmatn';
+        padding: 8px; /* Reduce padding */
+        margin: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 80%; /* Adjust width as necessary */
+        max-width: 300px; /* Set a maximum width */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    button {
+        font-family: 'Vazirmatn';
+        padding: 8px 12px; /* Reduce button padding */
+        background-color: #5cb85c;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px; /* Add some spacing above buttons */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+        background-color: #4cae4c;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+        .goal {
+            width: 95%; /* Adjust width for smaller screens */
+        }
+
+        input[type="text"], input[type="number"], button {
+            width: 90%; /* Make inputs and buttons wider on small screens */
+        }
+    }
+    </style>
+</head>
+<body>
+    <h1>«ردیاب کارهات»</h1>
+    <form action="/add_goal" method="POST">
+        <input type="text" name="goal_name" placeholder="نام پروژه" required>
+        <input type="number" name="goal_target" placeholder="تعداد کار" required>
+        <button type="submit">افزودن</button>
+    </form>
+    <div id="goals">
+        {% for goal in goals %}
+            <div class="goal">
+                <h2>{{ goal[1] }}</h2> <!-- goal[1] is the name -->
+                <p>{{ goal[3] }} از {{ goal[2] }} 
+                   {% if goal[3] >= goal[2] %} {% endif %} 
+                <br>{{ (goal[3] / goal[2] * 100) | round(2) }}%
+                </p>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: {{ (goal[3] / goal[2]) * 100 }}%;"></div>
+                </div>
+                {% if goal[3] < goal[2] %}
+                    <form action="{{ url_for('update_progress', goal_id=goal[0]) }}" method="POST">
+                        <input type="number" name="increment_value" placeholder="عدد">
+                        <br><button type="submit">افزایش</button>
+                    </form>
+                {% else %}
+                    <p>انجام شد!</p>
+                {% endif %}
+                <form action="{{ url_for('delete_goal', goal_id=goal[0]) }}" method="POST">
+                    <button type="submit" style="background-color: rgb(173, 0, 0); color: white;">حذف</button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
